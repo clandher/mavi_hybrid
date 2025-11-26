@@ -48,5 +48,19 @@ class ApiService {
     return http.get(Uri.parse('$host$endpoint'), headers: headers);
   }
 
-  // Puedes agregar más métodos como post, put, delete, etc.
+  static Future<http.Response> post(String endpoint, dynamic body) {
+    return http.post(
+      Uri.parse('$host$endpoint'),
+      headers: headers,
+      body: body is String ? body : body != null ? body is Map ? body : body : body != null ? body : null,
+    );
+  }
+  // Mejor: serializar body si es Map
+  // static Future<http.Response> post(String endpoint, dynamic body) {
+  //   return http.post(
+  //     Uri.parse('$host$endpoint'),
+  //     headers: headers,
+  //     body: body is String ? body : json.encode(body),
+  //   );
+  // }
 }

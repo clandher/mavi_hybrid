@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:intl/intl.dart';
+import 'package:mavi_hybrid/register_payment_screen.dart';
+import 'package:mavi_hybrid/select_student_screen.dart';
 import 'api_service.dart';
 import 'app_dimensions.dart';
 
@@ -81,21 +83,43 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // if (_selectedIndex == 0 && _firstPaymentJson != null)
-                //   Container(
-                //     width: double.infinity,
-                //     margin: const EdgeInsets.only(bottom: 12),
-                //     padding: const EdgeInsets.all(12),
-                //     decoration: BoxDecoration(
-                //       color: Colors.teal.shade900,
-                //       borderRadius: BorderRadius.circular(8),
-                //     ),
-                //     child: SelectableText(
-                //       maxLines: 6,
-                //       'Primer pago JSON:\n' + const JsonEncoder.withIndent('  ').convert(_firstPaymentJson),
-                //       style: const TextStyle(color: Colors.white, fontSize: 14),
-                //     ),
-                //   ),
+                Row(
+                  children: [
+                    ElevatedButton.icon(
+                      icon: Icon(Icons.add),
+                      label: Text('Registrar nuevo pago'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal.shade700,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: () async {
+                        // Navegar a la pantalla de selección de estudiante
+                        final selectedStudent = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SelectStudentScreen(),
+                          ),
+                        );
+                        // Si seleccionó estudiante, abrir pantalla de registro de pago
+                        if (selectedStudent != null) {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RegisterPaymentScreen(student: selectedStudent),
+                            ),
+                          );
+                          // Actualizar lista de pagos después de registrar
+                          setState(() {
+                            _paymentsFuture = fetchPayments();
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
                 Expanded(
                   child: _selectedIndex == 0
                       ? FutureBuilder<List<Payment>>(
