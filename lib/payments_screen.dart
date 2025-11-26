@@ -46,6 +46,16 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     }
   }
 
+  Future<List<dynamic>> fetchPaymentCharges(int paymentId) async {
+    final response = await ApiService.get('/payments/$paymentId/charges');
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data;
+    } else {
+      throw Exception('Error al cargar cargos: ${response.body}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<_MenuOption> _options = [
@@ -207,13 +217,37 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                                             ),
                                             icon: Icon(Icons.receipt_long, size: 18),
                                             label: Text('Ver cargos', style: TextStyle(fontSize: 14)),
-                                            onPressed: () {
+                                            onPressed: () async {
                                               showModalBottomSheet(
                                                 context: context,
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                                                 ),
-                                                builder: (context) => CargosModal(cargos: payment.charges),
+                                                builder: (context) {
+                                                  return FutureBuilder<Map<String, dynamic>>(
+                                                    future: ApiService.get('/payments/${payment.id}/charges').then((response) {
+                                                      if (response.statusCode == 200) {
+                                                        return json.decode(response.body) as Map<String, dynamic>;
+                                                      } else {
+                                                        throw Exception('Error al cargar cargos: \\${response.body}');
+                                                      }
+                                                    }),
+                                                    builder: (context, snapshot) {
+                                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                                        return Center(child: CircularProgressIndicator());
+                                                      }
+                                                      if (snapshot.hasError) {
+                                                        return Padding(
+                                                          padding: const EdgeInsets.all(16.0),
+                                                          child: Text('Error: \\${snapshot.error}', style: TextStyle(color: Colors.red)),
+                                                        );
+                                                      }
+                                                      final data = snapshot.data;
+                                                      final cargos = data != null ? data['paymentCharges'] as List<dynamic>? : null;
+                                                      return CargosModal(cargos: cargos);
+                                                    },
+                                                  );
+                                                },
                                               );
                                             },
                                           ),
@@ -323,15 +357,31 @@ class CargosModal extends StatelessWidget {
         children: [
           Text('Cargos aplicados', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           SizedBox(height: 12),
-          if (cargos == null || (cargos?.isEmpty ?? true))
+          if (cargos == null || cargos?.isEmpty == true)
             Text('No hay cargos para este pago', style: TextStyle(color: Colors.white70)),
-          if (cargos != null)
+          if (cargos?.isNotEmpty == true)
             ...cargos!.map((cargo) {
-              final concepto = cargo['concepto'] ?? cargo['name'] ?? 'Cargo';
-              final monto = cargo['monto'] ?? cargo['amount'] ?? '';
+              // cargo es un objeto paymentCharge
+              final collection = cargo['collection'] ?? {};
+              final actividad = cargo['activity'] ?? {};
+              final concepto = collection['concept'] ?? 'Cargo';
+              final monto = cargo['amount'] ?? 0.0;
+              final fechaCargo = collection['chargeDate'] != null
+                  ? DateFormat('dd/MM/yyyy').format(DateTime.parse(collection['chargeDate']))
+                  : '';
+              final descripcionActividad = actividad['description'] ?? '';
               return ListTile(
                 title: Text(concepto),
-                trailing: Text(' 24$monto'),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (descripcionActividad.isNotEmpty)
+                      Text(descripcionActividad, style: TextStyle(color: Colors.white70)),
+                    if (fechaCargo.isNotEmpty)
+                      Text('Fecha de cargo: $fechaCargo', style: TextStyle(color: Colors.white38)),
+                  ],
+                ),
+                trailing: Text(NumberFormat.currency(locale: 'es_MX', symbol: '\$').format(monto)),
               );
             }).toList(),
         ],
