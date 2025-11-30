@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_dimensions.dart';
+import 'neumorphism_theme.dart';
 
 class ObservationsScreen extends StatelessWidget {
   const ObservationsScreen({Key? key}) : super(key: key);
@@ -7,10 +8,10 @@ class ObservationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF181A20),
+      backgroundColor: Neumorphism.backgroundDark,
       appBar: AppBar(
-        title: const Text('Actualizar observaciones'),
-        backgroundColor: const Color(0xFF22242A),
+        title: Text('Actualizar observaciones', style: Neumorphism.neumorphicText(fontSize: 20, fontWeight: FontWeight.bold)),
+        backgroundColor: Neumorphism.accent,
         elevation: 0,
       ),
       body: Center(
@@ -19,17 +20,10 @@ class ObservationsScreen extends StatelessWidget {
           height: AppDimensions.height,
           child: Container(
             padding: const EdgeInsets.all(24.0),
-            decoration: BoxDecoration(
-              color: const Color(0xFF22242A),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Text(
+            decoration: Neumorphism.neumorphicBox(),
+            child: Text(
               'Pantalla para actualizar observaciones',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-              ),
+              style: Neumorphism.neumorphicText(fontSize: 20, fontWeight: FontWeight.w500),
             ),
           ),
         ),

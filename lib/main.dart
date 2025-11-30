@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'neumorphism_theme.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
 import 'payments_screen.dart';
@@ -16,6 +17,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: Neumorphism.themeData,
       initialRoute: '/',
       routes: {
         '/': (context) => const LoginScreen(),

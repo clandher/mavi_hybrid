@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'neumorphism_theme.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:intl/intl.dart';
@@ -50,22 +51,17 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: const Color(0xFF070707),
+        backgroundColor: const Color(0xFF181A20),
         appBar: AppBar(
-          title: const Text('Pagos'),
-          titleTextStyle: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-          backgroundColor: const Color(0xFF070707),
+          title: const Text('Pagos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+          backgroundColor: const Color(0xFF22242A),
           elevation: 0,
-          iconTheme: const IconThemeData(color: Colors.white),
-          bottom: TabBar(
+          iconTheme: const IconThemeData(color: Colors.tealAccent),
+          bottom: const TabBar(
             indicatorColor: Colors.tealAccent,
             labelColor: Colors.tealAccent,
             unselectedLabelColor: Colors.white38,
-            tabs: const [
+            tabs: [
               Tab(icon: Icon(Icons.payment), text: 'Pagos realizados'),
               Tab(icon: Icon(Icons.verified), text: 'Verificar pagos'),
             ],
@@ -82,11 +78,11 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                   future: _paymentsFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator(color: Colors.tealAccent));
                     } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                      return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.redAccent)));
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No hay pagos registrados', style: TextStyle(color: Colors.white)));
+                      return const Center(child: Text('No hay pagos registrados', style: TextStyle(color: Colors.white70)));
                     }
                     final payments = snapshot.data!;
                     return ListView.builder(
@@ -99,27 +95,21 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                             ? '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}'
                             : payment.paymentDate;
                         final formattedAmount = NumberFormat.currency(locale: 'es_MX', symbol: '\$').format(payment.amount);
-                        return Container(
-                          width: double.infinity,
+                        return Card(
+                          color: const Color(0xFF22242A),
                           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF23252B),
-                            borderRadius: BorderRadius.circular(6),
-                            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                            border: Border.all(color: Colors.teal.shade900.withOpacity(0.2), width: 1),
-                          ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 16.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  children: [
-                                    Text(formattedAmount, style: TextStyle(color: Colors.tealAccent, fontWeight: FontWeight.w600, fontSize: 16)),
-                                    Spacer(),
-                                    Icon(Icons.calendar_today, color: Colors.white70, size: 16),
+                                  children: [ 
+                                    Text(formattedAmount, style: const TextStyle(color: Colors.tealAccent, fontWeight: FontWeight.w600, fontSize: 16)),
+                                    const Spacer(),
+                                    const Icon(Icons.calendar_today, color: Colors.white70, size: 16),
                                     const SizedBox(width: 4),
-                                    Text(formattedDate, style: TextStyle(color: Colors.white70, fontSize: 14)),
+                                    Text(formattedDate, style: const TextStyle(color: Colors.white70, fontSize: 14)),
                                   ],
                                 ),
                                 const SizedBox(height: 10),
@@ -130,16 +120,16 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                                         future: ApiService.fetchStudentPhotoBytes(student['id'], student['photo']),
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return CircleAvatar(radius: 24, backgroundColor: Colors.grey.shade800, child: CircularProgressIndicator(strokeWidth: 2));
+                                            return const CircleAvatar(radius: 24, backgroundColor: Color(0xFF23252B), child: CircularProgressIndicator(strokeWidth: 2, color: Colors.tealAccent));
                                           }
                                           if (snapshot.hasData && snapshot.data != null) {
-                                            return CircleAvatar(radius: 24, backgroundImage: MemoryImage(snapshot.data!), backgroundColor: Colors.grey.shade800);
+                                            return CircleAvatar(radius: 24, backgroundImage: MemoryImage(snapshot.data!), backgroundColor: const Color(0xFF23252B));
                                           }
-                                          return CircleAvatar(radius: 24, backgroundColor: Colors.grey.shade800, child: Icon(Icons.person, size: 24));
+                                          return const CircleAvatar(radius: 24, backgroundColor: Color(0xFF23252B), child: Icon(Icons.person, size: 24, color: Colors.white));
                                         },
                                       )
                                     else
-                                      CircleAvatar(radius: 24, backgroundColor: Colors.grey.shade800, child: Icon(Icons.person, size: 24)),
+                                      const CircleAvatar(radius: 24, backgroundColor: Color(0xFF23252B), child: Icon(Icons.person, size: 24, color: Colors.white)),
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: Text(
@@ -149,25 +139,24 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                                     ),
                                   ],
                                 ),
-                                // ...voucher si lo quieres mostrar
                                 const SizedBox(height: 10),
-                                Divider(color: Colors.teal.shade700.withOpacity(0.5), thickness: 1),
+                                Divider(color: Colors.tealAccent.withOpacity(0.3), thickness: 1),
                                 const SizedBox(height: 8),
                                 Align(
                                   alignment: Alignment.centerRight,
                                   child: TextButton.icon(
                                     style: TextButton.styleFrom(
-                                      backgroundColor: Colors.teal.shade900.withOpacity(0.1),
+                                      backgroundColor: const Color(0xFF22242A).withOpacity(0.1),
                                       foregroundColor: Colors.tealAccent,
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                     ),
-                                    icon: Icon(Icons.receipt_long, size: 18),
-                                    label: Text('Ver cargos', style: TextStyle(fontSize: 14)),
+                                    icon: const Icon(Icons.receipt_long, size: 18),
+                                    label: const Text('Ver cargos', style: TextStyle(fontSize: 14)),
                                     onPressed: () async {
                                       showModalBottomSheet(
                                         context: context,
-                                        backgroundColor: Colors.grey[900], // O el color que prefieras
-                                        shape: RoundedRectangleBorder(
+                                        backgroundColor: const Color(0xFF23252B),
+                                        shape: const RoundedRectangleBorder(
                                           borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                                         ),
                                         builder: (context) {
@@ -181,12 +170,12 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                                             }),
                                             builder: (context, snapshot) {
                                               if (snapshot.connectionState == ConnectionState.waiting) {
-                                                return Center(child: CircularProgressIndicator());
+                                                return const Center(child: CircularProgressIndicator(color: Colors.tealAccent));
                                               }
                                               if (snapshot.hasError) {
                                                 return Padding(
                                                   padding: const EdgeInsets.all(16.0),
-                                                  child: Text('Error: \\${snapshot.error}', style: TextStyle(color: Colors.red)),
+                                                  child: Text('Error: \\${snapshot.error}', style: TextStyle(color: Colors.redAccent)),
                                                 );
                                               }
                                               final data = snapshot.data;
@@ -220,13 +209,13 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
               return FloatingActionButton.extended(
                 backgroundColor: Colors.teal.shade700,
                 foregroundColor: Colors.white,
-                icon: Icon(Icons.add),
-                label: Text('Registrar nuevo pago'),
+                icon: const Icon(Icons.add),
+                label: const Text('Registrar nuevo pago'),
                 onPressed: () async {
                   final selectedStudent = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => SelectStudentScreen(),
+                      builder: (context) => const SelectStudentScreen(),
                     ),
                   );
                   if (selectedStudent != null) {
@@ -236,7 +225,6 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                         builder: (context) => RegisterPaymentScreen(student: selectedStudent),
                       ),
                     );
-                    // Actualizar lista de pagos después de registrar
                     setState(() {
                       _paymentsFuture = fetchPayments();
                     });
@@ -244,7 +232,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                 },
               );
             }
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           },
         ),
       ),
@@ -304,17 +292,20 @@ class CargosModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF22242A),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Cargos aplicados', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 12),
+          const Text('Cargos aplicados', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          const SizedBox(height: 12),
           if (cargos == null || cargos?.isEmpty == true)
-            Text('No hay cargos para este pago', style: TextStyle(color: Colors.white70)),
+            const Text('No hay cargos para este pago', style: TextStyle(color: Colors.white70)),
           if (cargos?.isNotEmpty == true)
             ...cargos!.map((cargo) {
-              // cargo es un objeto paymentCharge
               final collection = cargo['collection'] ?? {};
               final actividad = cargo['activity'] ?? {};
               final concepto = collection['concept'] ?? 'Cargo';
@@ -323,18 +314,22 @@ class CargosModal extends StatelessWidget {
                   ? DateFormat('dd/MM/yyyy').format(DateTime.parse(collection['chargeDate']))
                   : '';
               final descripcionActividad = actividad['description'] ?? '';
-              return ListTile(
-                title: Text(concepto),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (descripcionActividad.isNotEmpty)
-                      Text(descripcionActividad, style: TextStyle(color: Colors.white70)),
-                    if (fechaCargo.isNotEmpty)
-                      Text('Fecha de cargo: $fechaCargo', style: TextStyle(color: Colors.white38)),
-                  ],
+              return Card(
+                color: const Color(0xFF22242A),
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                child: ListTile(
+                  title: Text(concepto, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (descripcionActividad.isNotEmpty)
+                        Text(descripcionActividad, style: const TextStyle(color: Colors.white70)),
+                      if (fechaCargo.isNotEmpty)
+                        Text('Fecha de  cargso: $fechaCargo', style: const TextStyle(color: Colors.white38)),
+                    ],
+                  ),
+                  trailing: Text(NumberFormat.currency(locale: 'es_MX', symbol: '\$').format(monto), style: const TextStyle(color: Colors.tealAccent, fontWeight: FontWeight.bold)),
                 ),
-                trailing: Text(NumberFormat.currency(locale: 'es_MX', symbol: '\$').format(monto)),
               );
             }).toList(),
         ],

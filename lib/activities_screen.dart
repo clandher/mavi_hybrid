@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_dimensions.dart';
+import 'neumorphism_theme.dart';
 
 class ActivitiesScreen extends StatelessWidget {
   const ActivitiesScreen({Key? key}) : super(key: key);
@@ -7,10 +8,10 @@ class ActivitiesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF181A20),
+      backgroundColor: Neumorphism.backgroundDark,
       appBar: AppBar(
-        title: const Text('Validar pagos'),
-        backgroundColor: const Color(0xFF22242A),
+        title: Text('Validar pagos', style: Neumorphism.neumorphicText(fontSize: 20, fontWeight: FontWeight.bold)),
+        backgroundColor: Neumorphism.accent,
         elevation: 0,
       ),
       body: Center(
@@ -19,17 +20,10 @@ class ActivitiesScreen extends StatelessWidget {
           height: AppDimensions.height,
           child: Container(
             padding: const EdgeInsets.all(24.0),
-            decoration: BoxDecoration(
-              color: const Color(0xFF22242A),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Text(
+            decoration: Neumorphism.neumorphicBox(borderRadius: 8.0),
+            child: Text(
               'Pantalla para validar pagos',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-              ),
+              style: Neumorphism.neumorphicText(fontSize: 20, fontWeight: FontWeight.w500),
             ),
           ),
         ),
