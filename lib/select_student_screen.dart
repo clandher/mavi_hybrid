@@ -131,75 +131,79 @@ class _SelectStudentScreenState extends State<SelectStudentScreen> {
                       itemCount: _filteredStudents.length,
                       itemBuilder: (context, index) {
                         final student = _filteredStudents[index];
-                        return Card(
-                          color: Neumorphism.highlight,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          clipBehavior: Clip.antiAlias,
-                          child: Material(
-                            color: Colors.transparent,
-                            child: ListTile(
-                              leading: (student['photo'] != null)
-                                  ? FutureBuilder<Uint8List?>(
-                                      future: ApiService.fetchStudentPhotoBytes(
-                                        student['id'],
-                                        student['photo'],
+                        return InkWell(
+                          onTap: () {
+                            Navigator.pop(context, student);
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Card(
+                            color: Neumorphism.highlight,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            clipBehavior: Clip.antiAlias,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              child: ListTile(
+                                leading: (student['photo'] != null)
+                                    ? FutureBuilder<Uint8List?>(
+                                        future: ApiService.fetchStudentPhotoBytes(
+                                          student['id'],
+                                          student['photo'],
+                                        ),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                            return CircleAvatar(
+                                              radius: 24,
+                                              backgroundColor: Neumorphism.shadow,
+                                              child: CircularProgressIndicator(strokeWidth: 2, color: Neumorphism.textSecondary),
+                                            );
+                                          }
+                                          if (snapshot.hasData && snapshot.data != null) {
+                                            return CircleAvatar(
+                                              radius: 24,
+                                              backgroundImage: MemoryImage(snapshot.data!),
+                                              backgroundColor: Neumorphism.shadow,
+                                            );
+                                          }
+                                          return CircleAvatar(
+                                            radius: 24,
+                                            backgroundColor: Neumorphism.shadow,
+                                            child: Icon(Icons.person, color: Neumorphism.textPrimary, size: 24),
+                                          );
+                                        },
+                                      )
+                                    : CircleAvatar(
+                                        radius: 24,
+                                        backgroundColor: Neumorphism.shadow,
+                                        child: Icon(Icons.person, color: Neumorphism.textPrimary, size: 24),
                                       ),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.waiting) {
-                                          return CircleAvatar(
-                                            radius: 24,
-                                            backgroundColor: Neumorphism.shadow,
-                                            child: CircularProgressIndicator(strokeWidth: 2, color: Neumorphism.textSecondary),
-                                          );
-                                        }
-                                        if (snapshot.hasData && snapshot.data != null) {
-                                          return CircleAvatar(
-                                            radius: 24,
-                                            backgroundImage: MemoryImage(snapshot.data!),
-                                            backgroundColor: Neumorphism.shadow,
-                                          );
-                                        }
-                                        return CircleAvatar(
-                                          radius: 24,
-                                          backgroundColor: Neumorphism.shadow,
-                                          child: Icon(Icons.person, color: Neumorphism.textPrimary, size: 24),
-                                        );
-                                      },
-                                    )
-                                  : CircleAvatar(
-                                      radius: 24,
-                                      backgroundColor: Neumorphism.shadow,
-                                      child: Icon(Icons.person, color: Neumorphism.textPrimary, size: 24),
+                                title: Text(
+                                  student['name'] ?? 'Sin nombre',
+                                  style: TextStyle(color: Neumorphism.textPrimary),
+                                ),
+                                subtitle: Row(
+                                  children: [
+                                    Text(
+                                      'Deuda: ',
+                                      style: TextStyle(
+                                        color: Neumorphism.textSecondary,
+                                      ),
                                     ),
-                              title: Text(
-                                student['name'] ?? 'Sin nombre',
-                                style: TextStyle(color: Neumorphism.textPrimary),
+                                    Text(
+                                      _formatCurrency(student['debt']),
+                                      style: TextStyle(
+                                        color: (student['debt'] is num && (student['debt'] as num) > 0)
+                                            ? Colors.amber[800]
+                                            : Neumorphism.textSecondary,
+                                        fontWeight: (student['debt'] is num && (student['debt'] as num) > 0)
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                // Elimina el onTap de ListTile, ahora toda la Card es interactiva
                               ),
-                              subtitle: Row(
-                                children: [
-                                  Text(
-                                    'Deuda: ',
-                                    style: TextStyle(
-                                      color: Neumorphism.textSecondary,
-                                    ),
-                                  ),
-                                  Text(
-                                    _formatCurrency(student['debt']),
-                                    style: TextStyle(
-                                      color: (student['debt'] is num && (student['debt'] as num) > 0)
-                                          ? Colors.amber[800]
-                                          : Neumorphism.textSecondary,
-                                      fontWeight: (student['debt'] is num && (student['debt'] as num) > 0)
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              onTap: () {
-                                Navigator.pop(context, student);
-                              },
                             ),
                           ),
                         );

@@ -133,69 +133,77 @@ class _RegisterPaymentScreenState extends State<RegisterPaymentScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Info del usuario seleccionado
-                  Card(
-                    color: const Color(0xFF22242A),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: ListTile(
-                      leading: (_selectedStudent['photo'] != null)
-                          ? FutureBuilder<Uint8List?>(
-                              future: ApiService.fetchStudentPhotoBytes(
-                                _selectedStudent['id'],
-                                _selectedStudent['photo'],
-                              ),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return CircleAvatar(
-                                    radius: 24,
-                                    backgroundColor: Color(0xFF23252B),
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
-                                  );
-                                }
-                                if (snapshot.hasData && snapshot.data != null) {
-                                  return CircleAvatar(
-                                    radius: 24,
-                                    backgroundImage: MemoryImage(snapshot.data!),
-                                    backgroundColor: Color(0xFF23252B),
-                                  );
-                                }
-                                return CircleAvatar(
+                  InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () async {
+                      final nuevoUsuario = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SelectStudentScreen(),
+                        ),
+                      );
+                      if (nuevoUsuario != null && nuevoUsuario is Map<String, dynamic>) {
+                        setState(() {
+                          _selectedStudent = nuevoUsuario;
+                          _loading = true;
+                        });
+                        await _fetchCharges();
+                      }
+                    },
+                    hoverColor: const Color(0xFF2C2F36),
+                    child: Card(
+                      color: const Color(0xFF22242A),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      clipBehavior: Clip.antiAlias,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                        child: ListTile(
+                          leading: (_selectedStudent['photo'] != null)
+                              ? FutureBuilder<Uint8List?>(
+                                  future: ApiService.fetchStudentPhotoBytes(
+                                    _selectedStudent['id'],
+                                    _selectedStudent['photo'],
+                                  ),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                      return CircleAvatar(
+                                        radius: 24,
+                                        backgroundColor: Color(0xFF23252B),
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
+                                      );
+                                    }
+                                    if (snapshot.hasData && snapshot.data != null) {
+                                      return CircleAvatar(
+                                        radius: 24,
+                                        backgroundImage: MemoryImage(snapshot.data!),
+                                        backgroundColor: Color(0xFF23252B),
+                                      );
+                                    }
+                                    return CircleAvatar(
+                                      radius: 24,
+                                      backgroundColor: Color(0xFF23252B),
+                                      child: Icon(Icons.person, color: Colors.white, size: 24),
+                                    );
+                                  },
+                                )
+                              : CircleAvatar(
                                   radius: 24,
                                   backgroundColor: Color(0xFF23252B),
                                   child: Icon(Icons.person, color: Colors.white, size: 24),
-                                );
-                              },
-                            )
-                          : CircleAvatar(
-                              radius: 24,
-                              backgroundColor: Color(0xFF23252B),
-                              child: Icon(Icons.person, color: Colors.white, size: 24),
-                            ),
-                      title: GestureDetector(
-                        child: Text(_selectedStudent['name'] ?? 'Sin nombre', style: const TextStyle(color: Colors.white, decoration: TextDecoration.underline)),
-                        onTap: () async {
-                          final nuevoUsuario = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SelectStudentScreen(),
-                            ),
-                          );
-                          if (nuevoUsuario != null && nuevoUsuario is Map<String, dynamic>) {
-                            setState(() {
-                              _selectedStudent = nuevoUsuario;
-                              _loading = true;
-                            });
-                            await _fetchCharges();
-                          }
-                        },
+                                ),
+                          title: Text(
+                            _selectedStudent['name'] ?? 'Sin nombre',
+                            style: const TextStyle(color: Colors.white, decoration: TextDecoration.none),
+                          ),
+                        ),
                       ),
-                      subtitle: Text('ID: ${_selectedStudent['id']}', style: const TextStyle(color: Colors.white70)),
                     ),
                   ),
                   Text('Monto a pagar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
+                    Stack(
+                      children: [
+                        TextField(
                           controller: _amountController,
                           keyboardType: TextInputType.numberWithOptions(decimal: true),
                           style: TextStyle(color: Colors.white),
@@ -205,23 +213,27 @@ class _RegisterPaymentScreenState extends State<RegisterPaymentScreen> {
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                             hintText: 'Monto',
                             hintStyle: TextStyle(color: Colors.white38),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                           ),
                           onChanged: _onAmountChanged,
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: _payFullAmount,
-                        style: ElevatedButton.styleFrom(
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: ElevatedButton(
+                            onPressed: _payFullAmount,
+                            style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF3A3F47),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              elevation: 2,
+                            ),
+                            child: const Text('Pagar total'),
+                          ),
                         ),
-                        child: const Text('Pagar total'),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
                   if (_error != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
